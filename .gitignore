@@ -1,0 +1,21 @@
+# Segredos: NUNCA commitar
+.env
+.env.*
+!.env.example
+*.session
+*.session-journal
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Dados locais de teste
+dados/
+*.log
+
+# Saídas geradas pelos scripts (não versionar)
+amostras/extraidas_*.jsonl
+amostras/avaliadas_*.jsonl

@@ -1,0 +1,198 @@
+# Critérios de compra. Três camadas:
+#  - regras_duras: números checados em código (eliminam rápido)
+#  - componentes: listas por nível. "excluir" reprova; os outros níveis viram
+#    informação pra IA. Componente fora de todas as listas: a IA julga e a tabela
+#    de calibração mostra, pra você decidir em qual lista colocar.
+#  - criterios_subjetivos: avaliados pela IA
+# Dado ausente na oferta NUNCA reprova sozinho: vira incerteza pra IA julgar.
+# Nomes são comparados por palavras, em ordem, ignorando maiúsculas, hífens,
+# "Intel", "AMD" e "Graphics": "Radeon Vega" pega "AMD Radeon RX Vega 8".
+
+regras_duras:
+  preco_max: 4500                 # R$, à vista
+  ram_min_gb: 16
+  armazenamento_min_gb: 512
+  tipo_armazenamento: SSD
+  tela_pol_min: 14
+  tela_pol_max: 16
+  # Mac é aceito: CS2 não roda em macOS, e tudo bem (decisão de 15/11/2026).
+  # Windows/Linux/sem sistema: precisa rodar CS2 com certeza (ver exigir_cs2 abaixo).
+  sistemas_aceitos: [Windows, Linux, sem sistema, macOS]
+  # Notebook que não é Mac só é notificado se a IA tiver certeza de que roda CS2
+  # em 1080p tranquilo (roda_cs2 = "sim"). "provavelmente" ou "não" barram.
+  exigir_cs2: true
+  excluir_termos: []              # ex.: ["peças", "defeito", "sem tela"]
+
+# Fora do teto, mas muito abaixo do preço justo de mercado: notifica como oportunidade.
+# Preço justo vem do site Qual Notebook Comprar (e, depois, do nosso histórico).
+oportunidade:
+  ativo: true
+  preco_max_absoluto: 5500        # nunca notificar acima disso
+  desconto_min_pct: 10            # pelo menos 10% abaixo do preço justo mínimo
+
+componentes:
+  gpu:
+    excelente: ["RTX 4060", "RTX 4070", "RTX 4080", "RTX 5060", "RTX 5070", "RTX 5080",
+                "RX 7600S", "RX 7700S", "RX 7800M"]
+    boa: ["RTX 3050", "RTX 3060", "RTX 4050", "RTX 5050", "Radeon 780M", "Radeon 860M",
+          "Radeon 880M", "Radeon 890M", "Radeon 8050S", "Radeon 8060S",
+          "Arc 140T", "Arc 140V", "Arc B390"]
+    # "Arc" sozinho pega as Arc da série H que não caíram nas listas acima.
+    # GTX 1650/1660/1060: comuns em usados; rodam CS2 em 1080p acima de 60 FPS.
+    ok: ["Radeon 680M", "Radeon 760M", "Arc 130T", "Arc 130V", "GTX 1660", "GTX 1650", "GTX 1060", "Arc"]
+    # Fraca: não reprova, mas CS2 em 1080p fica abaixo de 60 FPS.
+    fraca: ["RTX 2050", "MX 550", "MX 450", "Radeon 660M", "Radeon 740M"]
+    excluir: ["Intel UHD", "Iris Xe", "Radeon Vega", "Radeon 610M",
+              "Graphics 1 Xe3", "Graphics 2 Xe3", "Graphics 80 EUs", "Graphics 64 EUs"]
+  cpu:
+    # "Core 3" e "Core Ultra 3" são os nomes novos da Intel para a linha de entrada.
+    excluir: [Celeron, Pentium, Athlon, "Core i3", "Core 3", "Core Ultra 3", "Ryzen 3",
+              MediaTek, Snapdragon]
+  tela:
+    # Procurado no tipo de tela da oferta e no painel da ficha do site.
+    boa: [IPS, OLED, AMOLED, "120 Hz", "144 Hz", "165 Hz", "180 Hz", WUXGA, "2.8K", "2560"]
+    ruim: [TN, "1366"]
+
+condicao:
+  novo: aceito
+  recondicionado: aceito se vendido por loja/empresa com garantia de pelo menos 3 meses
+  usado_pessoa_fisica: aceito, mas a notificação marca "SEM GARANTIA" e exige nota maior
+  nota_minima_usado: 7         # igual aos novos: o risco do usado entra pelo preço, não pela nota
+
+criterios_subjetivos:
+  uso_principal: >
+    Programação (Claude Code, React, n8n, Supabase), navegador com muitas abas,
+    Office e estudo. Jogos: Minecraft, Counter-Strike 2, Stardew Valley, Overcooked
+    e outros indies leves. Rodar modelos de IA localmente de vez em quando para
+    testar, sem uso contínuo. GTA 6 seria um bônus, não requisito.
+  desejavel:
+    - RAM expansível ou com slot livre (mais RAM ajuda na IA local)
+    - RAM em dual-channel (faz muita diferença no desempenho do gráfico integrado)
+    - GPU dedicada NVIDIA (bônus: ajuda na IA local e numa eventual versão de GTA 6 pra PC)
+    - bateria boa (conta pontos, não reprova)
+    - tela IPS Full HD ou melhor, com bom brilho
+    - preço bem abaixo do preço justo de mercado
+  indiferente:
+    - peso (notebook pesado, como os gamer de 2,4 kg, não incomoda)
+  evitar:
+    - tela TN
+    - 8 GB soldados sem expansão
+    - pente único de RAM quando o gráfico é integrado
+
+contexto_jogos: >
+  Minecraft, Stardew Valley e Overcooked rodam em praticamente qualquer coisa que
+  passe nas regras duras. Counter-Strike 2 define o piso: gráfico integrado forte
+  (Radeon 780M) roda em 1080p médio acima de 60 FPS; Iris Xe e Intel UHD ficam abaixo.
+  GTA 6 lança em 19/11/2026 só para PS5 e Xbox, sem versão de PC nem requisitos
+  oficiais (só rumores de PC no 1º tri de 2027). GTA V Enhanced já recomenda nível
+  RTX 3060, então GTA 6 deve pedir mais. Não dimensionar a compra para GTA 6; GPU
+  dedicada é só bônus.
+
+notificacao:
+  nota_minima: 7                  # de 0 a 10
+  # O mesmo notebook (mesmo código de modelo) costuma ser repostado várias vezes e em
+  # vários canais. Dentro desta janela, só avisa de novo se o preço cair pelo menos X reais.
+  dedup_horas: 72
+  queda_minima_reais: 50
+  # Ao reiniciar, o monitor recupera mensagens antigas pra não perder nada. Só notifica as
+  # que chegaram há no máximo X horas (promoção velha costuma ter acabado); as outras só gravam.
+  notificar_ate_horas: 6
+  # Marketplace (OLX/Facebook): anúncio fica no ar até ser vendido; se ainda aparece na busca,
+  # está ativo. Janela maior.
+  notificar_ate_horas_marketplace: 168
+
+# OLX (API omkarcloud no RapidAPI; plano grátis = 1.000 consultas/mês).
+# Busca no RS inteiro (a API ignora zonas menores) e filtra as cidades abaixo no código.
+olx:
+  ativo: true
+  intervalo_min: 120            # 1 busca + 1 lote de detalhes a cada 2 h ≈ 720 consultas/mês
+  preco_min: 1500
+  preco_max: 5500
+  saldo_minimo: 60              # abaixo disso, para de consultar até o mês virar
+  cidades:                      # Região Metropolitana de Porto Alegre
+    - Porto Alegre
+    - Alvorada
+    - Araricá
+    - Arroio dos Ratos
+    - Cachoeirinha
+    - Campo Bom
+    - Canoas
+    - Capela de Santana
+    - Charqueadas
+    - Dois Irmãos
+    - Eldorado do Sul
+    - Estância Velha
+    - Esteio
+    - Glorinha
+    - Gravataí
+    - Guaíba
+    - Igrejinha
+    - Ivoti
+    - Montenegro
+    - Nova Hartz
+    - Nova Santa Rita
+    - Novo Hamburgo
+    - Parobé
+    - Portão
+    - Rolante
+    - Santo Antônio da Patrulha
+    - São Jerônimo
+    - São Leopoldo
+    - São Sebastião do Caí
+    - Sapiranga
+    - Sapucaia do Sul
+    - Taquara
+    - Triunfo
+    - Viamão
+
+# Usados de marketplace (OLX, Facebook): como julgar defeito e preço.
+usados:
+  # Defeito GRAVE reprova. MODERADO soma o custo de reparo ao preço ("preço efetivo").
+  # LEVE só aparece na mensagem. A IA só classifica o que o vendedor escreveu.
+  defeitos:
+    grave:
+      - tela quebrada, trincada ou com manchas/listras
+      - não liga ou desliga sozinho
+      - defeito na placa de vídeo (artefatos, tela azul em jogo)
+      - placa-mãe com defeito
+      - molhou / oxidação
+      - BIOS com senha ou conta/iCloud bloqueada
+      - carcaça quebrada que compromete a estrutura
+    moderado:                     # custo estimado de reparo em R$ (ajuste à vontade)
+      bateria viciada ou fraca: 350
+      tecla ou teclado falhando: 250
+      dobradiça frouxa ou quebrada: 250
+      sem carregador: 150
+      ssd pequeno (precisa trocar): 250
+      superaquecimento ou cooler barulhento: 150
+      touchpad com defeito: 200
+      outro defeito moderado: 200
+    leve:
+      - riscos e marcas de uso
+      - sem caixa
+      - adesivos ou desgaste de teclas
+      - pixel morto isolado
+  # Preço de referência. Prioridade: (1) mediana de usados parecidos na região, que é o
+  # mercado real; (2) se não houver parecidos suficientes, preço original × fator pela idade.
+  # Fatores calibrados com os usados reais da OLX (ex.: notebook de 2022 ≈ 55–60% do original).
+  depreciacao:
+    1: 0.80
+    2: 0.70
+    3: 0.60
+    4: 0.50
+    5: 0.40
+    6: 0.30
+    7: 0.22                       # 7 anos ou mais
+  # Parecidos = mesma GPU e mesma RAM, nos últimos N dias.
+  comparaveis_dias: 30
+  comparaveis_minimo: 4           # menos que isso, usa a depreciação
+  # Anti-golpe estatístico: abaixo de Q1 − 1,5×IQR dos parecidos = suspeito (precisa de ≥ 6).
+  iqr_minimo: 6
+
+# Resumo semanal dos "quase" (passaram nas regras, nota 5 a 6,9, não notificados).
+resumo_semanal:
+  ativo: true
+  dia: domingo
+  hora: 19                        # horário de Brasília
+  itens: 10
+  nota_min: 5
